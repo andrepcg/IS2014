@@ -34,74 +34,21 @@ public class NewsCrawler implements Runnable {
         this.pool = new LinkedBlockingQueue<>();
         this.c = new Crawler();
         this.jms = new JMS("topico", "admin", "admin");
+        (new Thread(jms)).start();
     }
-
-    private void running(){
-
-    }
-
-    private void menu(){
-        while(on){
-            int escolha;
-            Scanner sc = new Scanner(System.in);
-            
-
-            System.out.println("### News Crawler ###");
-            System.out.println("What do you want to crawl?");
-            System.out.println("1. CNN");
-
-            System.out.println("0. Exit");
-
-            do{
-                System.out.print("> ");
-                escolha = sc.nextInt();
-            }while (escolha > 1 || escolha < 0);
-
-            if(escolha == 0)
-                on = false;
-
-            if(escolha == 1)
-                cnnSections(sc);
-        }
-    }
-
-    private void cnnSections(Scanner sc){
-        int escolha;
-
-        System.out.println("What sections do you want to crawl?");
-        System.out.println("1. U.S.");
-        System.out.println("2. Africa");
-        System.out.println("3. Asia");
-        System.out.println("4. Europe");
-        System.out.println("5. Latin America");
-        System.out.println("6. Middle East");
-        System.out.println("7. All");
-        System.out.println("8. Local file");
-        System.out.println("0. Go back");
-
-        do{
-            System.out.print("> ");
-            escolha = sc.nextInt();
-        }while (escolha > 7 || escolha < 0);
-
-        if(escolha == 0)
-            return;
-        else{
-            NewsList n = this.c.crawl("CNN", escolha);
-        }
-
-
-    }
-
 
     private void fetch(){
-        n = this.c.crawl("CNN", 1);
-        populateClasses();
+        if((n = this.c.crawl("CNN", 1)) != null)
+            populateClasses();
+        else
+            logger.log("Crawling error");
     }
 
     private void try2send(String xml){
         if(!jms.send(xml))
             this.pool.add(xml);
+        else
+            logger.log("Send failed");
 
     }
 
@@ -119,7 +66,7 @@ public class NewsCrawler implements Runnable {
             jaxbMarshaller.marshal(this.n, sw);
 
         } catch (JAXBException e) {
-            //this.logger.log(Logger.marshall);
+            logger.log(e.toString());
             e.printStackTrace();
             return;
         }
@@ -142,9 +89,11 @@ public class NewsCrawler implements Runnable {
 
         } catch(SAXException e) {
             e.printStackTrace();
+            logger.log(e.toString());
             return false;
         } catch (IOException e) {
             e.printStackTrace();
+            logger.log(e.toString());
             return false;
         }
 
@@ -159,17 +108,12 @@ public class NewsCrawler implements Runnable {
             crawler = new NewsCrawler();
         } catch (Exception e) {
             crawler = null;
-            //System.out.println(Logger.logFileError);
-            System.out.println("Erro: caput, ja fostes");
+            logger.log("Couldn't start crawler");
         }
 
         if (crawler != null) {
             //crawler.loadQueue();
-            //crawler.menu();
-
             (new Thread(crawler)).start();
-
-            //crawler.fetch();
 
         }
     }
@@ -178,20 +122,20 @@ public class NewsCrawler implements Runnable {
     public void run() {
         String data;
         while(this.on) {
-            try {
-                Thread.sleep(10000);
-            } catch (InterruptedException e) {
-                //this.logger.log(Logger.sleep);
-                e.printStackTrace();
-            }
 
             try {
                 this.fetch();
                 data = this.pool.take();
                 try2send(data);
             } catch (InterruptedException e) {
-                e.printStackTrace();
-                //this.logger.log(Logger.threadKilled);
+                //e.printStackTrace();
+                logger.log("Thread killed");
+            }
+            try {
+                Thread.sleep(10000);
+            } catch (InterruptedException e) {
+                logger.log("Thread sleep error");
+                //e.printStackTrace();
             }
         }
     }

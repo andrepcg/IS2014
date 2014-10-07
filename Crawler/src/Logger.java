@@ -9,7 +9,6 @@ import java.util.Date;
 public class Logger {
 
     private PrintWriter pw;
-    Date date = new Date();
 
     public Logger(String nome) {
         String timestamp = new Timestamp((new java.util.Date()).getTime()).toString();

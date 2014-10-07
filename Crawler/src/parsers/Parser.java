@@ -34,7 +34,8 @@ public abstract class Parser {
             System.out.println("Read timeout");
 
         } catch (IOException e) {
-            e.printStackTrace();
+            System.out.println("HTTP get error");
+            //e.printStackTrace();
         }
         return null;
     }

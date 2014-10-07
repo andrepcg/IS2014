@@ -5,7 +5,8 @@ import javax.jms.*;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
-public class JMS {
+
+public class JMS implements Runnable{
 
     private String topic, user, password;
     private ConnectionFactory cf;
@@ -16,6 +17,12 @@ public class JMS {
     //private LinkedBlockingQueue<String> pool;
 
     private boolean connected;
+
+    public void setKeepConnecting(Boolean keepConnecting) {
+        this.keepConnecting = keepConnecting;
+    }
+
+    private Boolean keepConnecting = true;
 
     public JMS(String topic, String user, String password) {
         this.topic = topic;
@@ -38,17 +45,18 @@ public class JMS {
             this.mp = this.s.createProducer(this.d);
 
         } catch (NamingException | JMSException e) {
-            e.printStackTrace();
+            System.out.println(e.toString());
             return false;
-        } finally {
-            return true;
         }
+
+        return true;
     }
 
     public boolean send(String msg) {
         TextMessage tm;
-        if(!connected)
-            connected = connect();
+        //if(!connected)
+            //connected = connect();
+
 
         try {
 
@@ -57,13 +65,29 @@ public class JMS {
 
         } catch (JMSException e) {
             connected = false;
+            e.printStackTrace();
             return false;
-        } finally {
-            return true;
         }
+
+        return true;
     }
 
     public boolean isConnected() {
         return connected;
+    }
+
+    @Override
+    public void run() {
+        while (keepConnecting){
+            if(!connected)
+                connected = connect();
+            try {
+                Thread.sleep(5000);
+            } catch (InterruptedException e) {
+                //logger.log("Thread sleep error");
+                e.printStackTrace();
+            }
+
+        }
     }
 }
