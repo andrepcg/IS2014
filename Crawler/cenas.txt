@@ -1,0 +1,21 @@
+http://us.cnn.com/video/data/3.0/video/us/2014/09/19/tsr-presser-uva-missing-girl-hannah-graham.cnn/index.xml?xml=true
+
+
+<xs:element name="score">
+          <xs:simpleType>
+            <xs:restriction base="xs:double">
+              <xs:minInclusive value="-1"/>
+              <xs:maxInclusive value="10"/>
+            </xs:restriction>
+          </xs:simpleType>
+        </xs:element>
+
+
+        <xs:element name="genres">
+			<xs:complexType>
+			  <xs:sequence>
+				<xs:element minOccurs="0" maxOccurs="unbounded" name="genre" type="xs:string"/>
+			  </xs:sequence>
+			</xs:complexType>
+		  </xs:element>
+        <xs:element name="director" type="xs:string"/>

@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<news_list>
+    <section id="us">
+        <article>
+            <title> Ola eu sou o Jose </title>
+            <url>http://cnn.com</url>
+            <image>http://stackoverflow.com/</image>
+            <timestamp>11212312312</timestamp>
+            <author>Pedro Alberto</author>
+            <author>Carlos Simao</author>
+            <corpus>Bolas, encontrei um gajo na casa de banho que mandava peidos!</corpus>
+            <section>U.S.</section>
+        </article>
+        <article>
+            <title> Ola eu sou o Jose </title>
+            <url>http://cnn.com</url>
+            <image>http://stackoverflow.com/</image>
+            <timestamp>11212312312</timestamp>
+            <author>Pedro Alberto</author>
+            <author>Carlos Simao</author>
+            <corpus>Bolas, encontrei um gajo na casa de banho que mandava peidos!</corpus>
+            <section>U.S.</section>
+        </article>
+    </section>
+    <section id="africa">
+        <article>
+            <title> Ola eu sou o Jose </title>
+            <url>http://cnn.com</url>
+            <image>http://stackoverflow.com/</image>
+            <timestamp>11212312312</timestamp>
+            <author>Pedro Alberto</author>
+            <author>Carlos Simao</author>
+            <corpus>Bolas, encontrei um gajo na casa de banho que mandava peidos!</corpus>
+            <section>U.S.</section>
+        </article>
+        <article>
+            <title> Ola eu sou o Jose </title>
+            <url>http://cnn.com</url>
+            <image>http://stackoverflow.com/</image>
+            <timestamp>11212312312</timestamp>
+            <author>Pedro Alberto</author>
+            <author>Carlos Simao</author>
+            <corpus>Bolas, encontrei um gajo na casa de banho que mandava peidos!</corpus>
+            <section>U.S.</section>
+        </article>
+    </section>
+</news_list>	
