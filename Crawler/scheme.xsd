@@ -19,7 +19,7 @@
 												<xs:enumeration value="AFRICA"/>
 												<xs:enumeration value="EUROPE"/>
 												<xs:enumeration value="LATINAMERICA"/>
-												<xs:enumeration value="MIDDLEEAST"/>
+												<xs:enumeration value="MIDDLE EAST"/>
 												<xs:enumeration value="ASIA"/>
 											</xs:restriction>
 										</xs:simpleType>
