@@ -103,6 +103,7 @@ public class NewsCrawler implements Runnable {
     public static void main(String[] args) {
 
         NewsCrawler crawler = null;
+        logger.log("Starting crawler");
 
         try {
             crawler = new NewsCrawler();
@@ -124,6 +125,8 @@ public class NewsCrawler implements Runnable {
         while(this.on) {
 
             try {
+                System.out.println("asd");
+                logger.log("Fecthing news");
                 this.fetch();
                 data = this.pool.take();
                 try2send(data);
@@ -131,6 +134,7 @@ public class NewsCrawler implements Runnable {
                 //e.printStackTrace();
                 logger.log("Thread killed");
             }
+
             try {
                 Thread.sleep(10000);
             } catch (InterruptedException e) {

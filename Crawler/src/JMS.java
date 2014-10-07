@@ -45,7 +45,7 @@ public class JMS implements Runnable{
             this.mp = this.s.createProducer(this.d);
 
         } catch (NamingException | JMSException e) {
-            System.out.println(e.toString());
+            //System.out.println(e.toString());
             return false;
         }
 
@@ -54,20 +54,20 @@ public class JMS implements Runnable{
 
     public boolean send(String msg) {
         TextMessage tm;
-        //if(!connected)
-            //connected = connect();
 
+        if(connected){
+            try {
 
-        try {
+                tm = this.s.createTextMessage(msg);
+                this.mp.send(tm);
 
-            tm = this.s.createTextMessage(msg);
-            this.mp.send(tm);
-
-        } catch (JMSException e) {
-            connected = false;
-            e.printStackTrace();
-            return false;
+            } catch (JMSException e) {
+                connected = false;
+                e.printStackTrace();
+                return false;
+            }
         }
+        else return false;
 
         return true;
     }

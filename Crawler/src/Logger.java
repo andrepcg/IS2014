@@ -22,7 +22,7 @@ public class Logger {
 
     public void log(String l){
         String time = new Timestamp(new java.util.Date().getTime()).toString();
-        pw.write("[ " + time + " ] - " + l + "\n\r");
+        pw.write("[ " + time + " ] - " + l + "\n");
         pw.flush();
     }
 

@@ -31,10 +31,10 @@ public abstract class Parser {
             return doc;
 
         } catch (SocketTimeoutException e) {
-            System.out.println("Read timeout");
+            //System.out.println("Read timeout");
 
         } catch (IOException e) {
-            System.out.println("HTTP get error");
+            //System.out.println("HTTP get error");
             //e.printStackTrace();
         }
         return null;
