@@ -1,11 +1,12 @@
+import classes.Article;
 import classes.NewsList;
 import org.xml.sax.SAXException;
-import sun.misc.Signal;
-import sun.misc.SignalHandler;
+import parsers.CNN;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.StringWriter;
+import java.util.Scanner;
 import java.util.concurrent.LinkedBlockingQueue;
 import javax.xml.*;
 import javax.xml.bind.JAXBContext;
@@ -38,24 +39,21 @@ public class NewsCrawler implements Runnable {
 
     private void fetch(){
         if((n = this.c.crawl("CNN", 1)) != null)
-            populateNewsList(this.n);
+            populateClasses();
         else
             logger.log("Crawling error");
     }
 
     private void try2send(String xml){
-        if(!jms.send(xml)) {
-            logger.log("Send failed");
+        if(!jms.send(xml))
             this.pool.add(xml);
-
-        }else{
-
-        }
+        else
+            logger.log("Send failed");
 
     }
 
 
-    private void populateNewsList(NewsList n) {
+    private void populateClasses() {
 
         StringWriter sw = new StringWriter();
 
@@ -65,7 +63,7 @@ public class NewsCrawler implements Runnable {
             Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
             jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
             jaxbMarshaller.setProperty("com.sun.xml.internal.bind.xmlHeaders", "<?xml-stylesheet type=\"text/xsl\" href=\"transform.xsl\"?>\n");
-            jaxbMarshaller.marshal(n, sw);
+            jaxbMarshaller.marshal(this.n, sw);
 
         } catch (JAXBException e) {
             logger.log(e.toString());
@@ -102,15 +100,9 @@ public class NewsCrawler implements Runnable {
         return true;
     }
 
-    public void shutdown(){
-        System.out.println("Saving shit");
-    }
-
-    public static void main(String[] args)  throws InterruptedException {
-
+    public static void main(String[] args) {
 
         NewsCrawler crawler = null;
-
         logger.log("Starting crawler");
 
         try {
