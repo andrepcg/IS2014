@@ -9,11 +9,11 @@ import javax.naming.NamingException;
 public class JMS implements Runnable{
 
     private String topic, user, password;
-    private ConnectionFactory cf;
-    private Connection conn;
-    private Session s;
-    private Destination d;
-    private MessageProducer mp;
+
+
+    private TopicConnection topicConn;
+    private TopicSession topicSession;
+    private TopicPublisher topicPublisher;
     //private LinkedBlockingQueue<String> pool;
 
     private boolean connected;
@@ -34,42 +34,56 @@ public class JMS implements Runnable{
     }
 
     private boolean connect(){
-        try {
-            InitialContext init;
-            init = new InitialContext();
-            this.cf = (QueueConnectionFactory) init.lookup("jms/RemoteConnectionFactory");
-            this.d = (Destination) init.lookup(this.topic);
-            this.conn = (Connection) this.cf.createConnection(this.user, this.password);
-            this.conn.start();
-            this.s = this.conn.createSession(false, Session.AUTO_ACKNOWLEDGE);
-            this.mp = this.s.createProducer(this.d);
+        try{
+            // get the initial context
+            InitialContext ctx = new InitialContext();
+            // lookup the topic object
+            Topic topic = (Topic) ctx.lookup("jms/topic/project");
 
-        } catch (NamingException | JMSException e) {
-            //System.out.println(e.toString());
-            return false;
+            // lookup the topic connection factory
+            TopicConnectionFactory connFactory = (TopicConnectionFactory) ctx.lookup("jms/RemoteConnectionFactory");
+
+            // create a topic connection
+            topicConn = connFactory.createTopicConnection(user, password);
+
+            // create a topic session
+            topicSession = topicConn.createTopicSession(false, Session.AUTO_ACKNOWLEDGE);
+
+            // create a topic publisher
+            topicPublisher = topicSession.createPublisher(topic);
+            topicConn.start();
+
+        }catch(JMSException e){
+
+            System.out.println("Server is down! ");
+
+
+
+
+        }catch(NamingException e){
+            System.out.println("Server is down! ");
+
         }
 
         return true;
     }
 
-    public boolean send(String msg) {
-        TextMessage tm;
+    public boolean sendMessage(String xmlString){
 
-        if(connected){
-            try {
 
-                tm = this.s.createTextMessage(msg);
-                this.mp.send(tm);
-
-            } catch (JMSException e) {
-                connected = false;
-                e.printStackTrace();
-                return false;
-            }
+        try {
+            
+            Message message=null;
+            message=topicSession.createMessage();
+            message.setStringProperty("xml",xmlString);
+            topicPublisher.publish(message);
+        } catch (JMSException e) {
+            e.printStackTrace();
+            return false;
         }
-        else return false;
 
         return true;
+
     }
 
     public boolean isConnected() {
