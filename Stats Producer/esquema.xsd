@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+  <xs:element name="news_list">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="article" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="article">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="1" ref="title" />
+        <xs:element minOccurs="0" maxOccurs="1" ref="url" />
+        <xs:element minOccurs="0" maxOccurs="1" ref="image" />
+        <xs:element minOccurs="0" maxOccurs="1" ref="timestamp" />
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="author" />
+        <xs:element minOccurs="0" maxOccurs="1" ref="corpus" />
+        <xs:element minOccurs="0" maxOccurs="1" ref="section" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="title" type="xs:string" />
+  <xs:element name="url" type="xs:anyURI" />
+  <xs:element name="image" type="xs:anyURI" />
+  <xs:element name="timestamp" type="xs:positiveInteger" />
+  <xs:element name="author" type="xs:string" />
+  <xs:element name="corpus" type="xs:string" />
+  <xs:element name="section" type="xs:NCName" />
+</xs:schema>

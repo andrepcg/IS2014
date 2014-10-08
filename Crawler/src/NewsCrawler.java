@@ -30,7 +30,7 @@ public class NewsCrawler implements Runnable {
     private NewsList n;
 
     public NewsCrawler() {
-        this.pool = new LinkedBlockingQueue<>();
+        this.pool = new LinkedBlockingQueue<String>();
         this.c = new Crawler();
         this.jms = new JMS("topico", "admin", "admin");
         (new Thread(jms)).start();
