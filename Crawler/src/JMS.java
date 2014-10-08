@@ -68,11 +68,11 @@ public class JMS implements Runnable{
         return true;
     }
 
-    public boolean sendMessage(String xmlString){
+    public boolean send(String xmlString){
 
 
         try {
-            
+
             Message message=null;
             message=topicSession.createMessage();
             message.setStringProperty("xml",xmlString);
