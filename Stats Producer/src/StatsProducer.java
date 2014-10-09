@@ -1,5 +1,8 @@
+package src;
 
 import java.util.*;
+import java.sql.Timestamp;
+import java.util.Date;
 import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
 import javax.jms.Destination;
@@ -22,20 +25,23 @@ import javax.xml.validation.Validator;
 import java.io.*;
 import classes.*;
 import org.xml.sax.SAXException;
+import sun.jvm.hotspot.utilities.Interval;
 
 import java.io.File;
 import java.util.Scanner;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by jmcalves275 on 03/10/14.
  */
 public class StatsProducer {
     NewsList listaNoticias;
-     TopicSubscriber topicSubscriber;
-     InitialContext ctx;
-     Topic topic;
-     TopicConnectionFactory connFactory;
-     TopicConnection topicConn;
+
+    TopicSubscriber topicSubscriber;
+    InitialContext ctx;
+    Topic topic;
+    TopicConnectionFactory connFactory;
+    TopicConnection topicConn;
     TopicSession topicSession;
     public StatsProducer()  throws NamingException, JMSException {
         while(!initConection());
@@ -43,6 +49,7 @@ public class StatsProducer {
     }
     public boolean initConection(){
         try{
+            //topicConn.close();
             ctx = new InitialContext();
 
             // lookup the topic object
@@ -68,7 +75,7 @@ public class StatsProducer {
 
 
         }catch(JMSException e){
-            System.out.println(e.getMessage());
+
             System.out.println("Can't establish connection to the server. We'll retry in 5 seconds");
             try{
                 Thread.sleep(5000);
@@ -78,7 +85,7 @@ public class StatsProducer {
             return false;
 
         }catch(NamingException e){
-            System.out.println(e.getMessage());
+
             System.out.println("Can't establish connection to the server. We'll retry in 5 seconds");
             try{
                 Thread.sleep(5000);
@@ -90,59 +97,145 @@ public class StatsProducer {
         }
         return true;
     }
+    public boolean retryConnection() {
+
+        try{
+            topicConn.close();
+            // create a topic connection
+            //connFactory = (TopicConnectionFactory) ctx.lookup("jms/RemoteConnectionFactory");
+            topicConn = connFactory.createTopicConnection("admin1", "admin");
+
+            topicConn.setClientID("admin1");
+
+            // create a topic session
+            TopicSession topicSession = topicConn.createTopicSession(false,Session.AUTO_ACKNOWLEDGE);
+
+            // create a topic subscriber
+            topicSubscriber=topicSession.createDurableSubscriber(topic, "topic1");
+
+            topicConn.start();
+
+
+
+            System.out.println("Connection to the topic retablished!");
+            return true;
+        }catch(Exception e){
+
+            System.out.println("Topic is down! We will retry the connection in 5 seconds...");
+            try{
+                Thread.sleep(5000);
+            }catch(InterruptedException s){
+                System.out.println(s.getMessage());
+            }
+
+            return false;
+        }
+    }
     public void receive(){
 
-            boolean checkFicheiro=false;
-
+        boolean checkFicheiro=false;
+        while(true) {
             try {
 
                 Message m = topicSubscriber.receive();
 
 
-
                 String doc = m.getStringProperty("xml");
 
-                System.out.println("Message received from topic!\n");
-                //System.out.println(doc);
+                System.out.println("Messages received from topic!\n");
+                System.out.println(doc);
 
 
-                checkFicheiro=validateXML("esquema.xsd","filename.xml");
-                System.out.println(checkFicheiro);
-                if(!checkFicheiro){
+                checkFicheiro = validateXML("/Users/jmcalves275/Desktop/Faculdade/Mestrado/IS/Assignment_1/IS2014/Stats Producer/esquema.xsd", "/Users/jmcalves275/Desktop/Faculdade/Mestrado/IS/Assignment_1/IS2014/Stats Producer/filename.xml");
+
+                if (!checkFicheiro) {
                     System.out.println("O ficheiro XML é inválido");
                     receive();
-                }
-                else {
+                } else {
                     unmarshal(doc);
                     produceStats();
 
                 }
             } catch (JMSException e) {
                 //System.out.println(e.getMessage());
+                while (!retryConnection()) ;
+                //receive();
 
 
             } catch (NullPointerException e) {
+                while (!retryConnection()) ;
+                //receive();
 
             }
+        }
 
     }
+
     public void produceStats(){
-        List<Article> listaArtigos=listaNoticias.getArticle();
-        System.out.println(listaArtigos.get(0).getAuthor());
+
+
+        long timestamp=System.currentTimeMillis();
+
+
+        for(int i=0;i<listaNoticias.getArticle().size();i++){
+
+            long x=(listaNoticias.getArticle().get(i).getTimestamp()).longValue();
+
+            Date startDate = new Date(x);
+            Date endDate   =new Date(System.currentTimeMillis());
+            long interval  = endDate.getTime() - startDate.getTime();
+            interval=TimeUnit.MILLISECONDS.toMinutes(interval);
+            System.out.println("Tempo actual: "+endDate+" Tempo qda noticia: "+startDate+" Tempo duracao: "+interval+" Titulo: "+listaNoticias.getArticle().get(i).getTitle());
+            if (interval<(12*60))//converter 12 horas em minutos
+            {
+                System.out.println("oisd");
+                listaNoticias.getArticle().remove(listaNoticias.getArticle().get(i));
+                System.out.println("Print cenas: "+listaNoticias.getArticle().get(i).getTitle());
+            }
+
+
+        }
+        for(int i=0;i<listaNoticias.getArticle().size();i++){
+            System.out.println("Cenas: "+listaNoticias.getArticle().get(i).getTitle());
+        }
+        //
+
     }
 
     public void unmarshal(String doc){
         try {
+            NewsList listaProvisoria;
             JAXBContext jaxbContext = JAXBContext.newInstance(NewsList.class);
             Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
 
             StringReader reader = new StringReader(doc);
-            listaNoticias = (NewsList) unmarshaller.unmarshal(reader);
-        }catch(JAXBException e){
-                System.out.println("Erro ao fazer unmarshal");
-            }
-    }
+            listaProvisoria = (NewsList) unmarshaller.unmarshal(reader);
 
+            mergeLists(listaProvisoria);
+        }catch(JAXBException e){
+            System.out.println("Erro ao fazer unmarshal");
+        }
+    }
+    public void mergeLists(NewsList listaProvisoria){
+        listaNoticias=new NewsList();
+        listaNoticias.getArticle().add(listaProvisoria.getArticle().get(0));
+        boolean check;
+        for(int i=0;i<listaProvisoria.getArticle().size();i++ ){
+           System.out.println("Titulo: "+listaProvisoria.getArticle().get(i).getTitle()+" e na lista ta: "+listaNoticias.getArticle().get(0).getTitle()+" "+listaNoticias.getArticle().get(0).getAuthor());
+
+           check=listaNoticias.getArticle().contains(listaProvisoria.getArticle().get(i));
+            System.out.println(check);
+              if(check){
+                    System.out.print("MERDA: "+listaProvisoria.getArticle().get(i).getTitle());
+              }
+            else{
+                  listaNoticias.addArticle(listaProvisoria.getArticle().get(i));
+              }
+
+
+        }
+
+    }
     public static boolean validateXML(String xsdPath, String xmlPath){
 
         try {
@@ -164,7 +257,7 @@ public class StatsProducer {
         try {
 
             topicSubscriber.close();
-            topicSession.unsubscribe("topic1");
+
             System.exit(0);
 
         } catch (JMSException e) {
@@ -175,8 +268,8 @@ public class StatsProducer {
 
         StatsProducer statsProducer = new StatsProducer();
 
-         statsProducer.receive();
-         statsProducer.close();
+        statsProducer.receive();
+        statsProducer.close();
 
 
     }
