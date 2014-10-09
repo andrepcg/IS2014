@@ -56,12 +56,13 @@ public class JMS implements Runnable{
         }catch(JMSException e){
 
             System.out.println("Server is down! ");
-
+            return false;
 
 
 
         }catch(NamingException e){
             System.out.println("Server is down! ");
+            return false;
 
         }
 
