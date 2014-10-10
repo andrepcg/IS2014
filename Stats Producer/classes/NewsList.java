@@ -90,5 +90,5 @@ public class NewsList {
 
         return false;
     }
-    
+
 }
