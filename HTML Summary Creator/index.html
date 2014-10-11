@@ -25,15 +25,12 @@
          <div class="row">
             <div class="col-sm-12">
 
-            <button type="button" class="btn btn-primary" data-section="U.S.">U.S.</button>
-            <button type="button" class="btn btn-primary">Africa</button>
-
                 <div class="btn-group" data-toggle="buttons">
-                  <label class="btn btn-primary active">
-                    <input type="radio" name="options" id="us" checked> U.S.
+                  <label class="btn btn-primary">
+                    <input type="checkbox" name="options" id="us" data-section="U.S."> U.S.
                   </label>
                   <label class="btn btn-primary">
-                    <input type="radio" name="options" id="africa"> Africa
+                    <input type="checkbox" name="options" id="africa" data-section="Africa"> Africa
                   </label>
                 </div>
 
@@ -522,7 +519,7 @@
                         <div class="meta">
                            <ul class="list-inline">
                               <li><span class="glyphicon glyphicon-book"></span><span class="jornal">1412718780000</span></li>
-                              <li><span class="glyphicon glyphicon-tag"></span><span class="categoria" data-cat="U.S.">U.S.</span></li>
+                              <li><span class="glyphicon glyphicon-tag"></span><span class="categoria" data-cat="Africa">Africa</span></li>
                               <li><span class="glyphicon glyphicon-globe"></span><span class="url"><a href="http://edition.cnn.com/2014/10/07/studentnews/sn-content-weds/index.html">Link</a></span></li>
                            </ul>
                         </div>
@@ -543,6 +540,20 @@
 
     $( document ).ready(function() {
 
+      $("input").change(function(){
+        var l = [];
+        $("input:checked").each(function(){
+          l.push($(this).attr("data-section"));
+        });
+        setVisible(l.length > 1 ? l : l[0]);
+
+        var l2 = [];
+        $("input:not(:checked)").each(function(){
+          l2.push($(this).attr("data-section"));
+        });
+        setInvisible(l2.length > 1 ? l2 : l2[0]);
+      });
+
       $("#button[data-section='U.S.']").click(function(){
         var cat = $(this).attr("data-section");
 
@@ -553,19 +564,42 @@
 
       var setVisible = function(section){
         if(typeof section === "string"){
-          $(".noticia .categoria[data-cat!='"+section+"']").each(function() {
+          $(".noticia .categoria[data-cat='"+section+"']").each(function() {
             $( this ).closest(".noticia").removeClass("hidden");
           });
         }
-        else if(typeof section === "object"){
-          var f = ".noticia .categoria[data-cat!='qwerty']";
+        else if(typeof section === "object" && section.length > 0){
+          var f = ".noticia .categoria[data-cat='qwerty']";
           var q = "";
           section.forEach(function(sec){
-              q += f.replace("querty", sec) + ", ";
+              q += f.replace("qwerty", sec) + ", ";
           });
+
+          q = q.substr(0, q.length - 2);
 
           $(q).each(function() {
             $( this ).closest(".noticia").removeClass("hidden");
+          });
+        }
+      };
+
+      var setInvisible = function(section){
+        if(typeof section === "string"){
+          $(".noticia .categoria[data-cat='"+section+"']").each(function() {
+            $( this ).closest(".noticia").addClass("hidden");
+          });
+        }
+        else if(typeof section === "object" && section.length > 0){
+          var f = ".noticia .categoria[data-cat='qwerty']";
+          var q = "";
+          section.forEach(function(sec){
+              q += f.replace("qwerty", sec) + ", ";
+          });
+
+          q = q.substr(0, q.length - 2);
+
+          $(q).each(function() {
+            $( this ).closest(".noticia").addClass("hidden");
           });
         }
       };
