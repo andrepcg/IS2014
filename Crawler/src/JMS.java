@@ -14,7 +14,6 @@ public class JMS implements Runnable{
     private TopicConnection topicConn;
     private TopicSession topicSession;
     private TopicPublisher topicPublisher;
-    //private LinkedBlockingQueue<String> pool;
 
     private boolean connected;
 
