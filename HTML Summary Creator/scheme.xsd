@@ -2,9 +2,7 @@
 <xs:element name="news_list">
     <xs:complexType>
         <xs:sequence>
-            <xs:element name="section" maxOccurs="unbounded" minOccurs="0">
-                <xs:complexType>
-                    <xs:sequence>
+
                         <xs:element name="article" maxOccurs="unbounded" minOccurs="0">
                             <xs:complexType>
                                 <xs:sequence>
@@ -14,25 +12,23 @@
                                     <xs:element minOccurs="0" maxOccurs="1" type="xs:positiveInteger" name="timestamp"/>
                                     <xs:element type="xs:string" name="author" maxOccurs="unbounded" minOccurs="0"/>
                                     <xs:element minOccurs="0" maxOccurs="1" type="xs:string" name="corpus"/>
-                                    <xs:element minOccurs="0" maxOccurs="1" type="xs:string" name="section"/>
+                                    <xs:element minOccurs="0" maxOccurs="1" name="section" type="xs:string">
+                                        <!--
+										<xs:simpleType >
+											<xs:restriction base="xs:string">
+												<xs:enumeration value="U.S."/>
+												<xs:enumeration value="AFRICA"/>
+												<xs:enumeration value="EUROPE"/>
+												<xs:enumeration value="LATINAMERICA"/>
+												<xs:enumeration value="MIDDLE EAST"/>
+												<xs:enumeration value="ASIA"/>
+											</xs:restriction>
+										</xs:simpleType>
+                                        -->
+									</xs:element>
                                 </xs:sequence>
                             </xs:complexType>
                         </xs:element>
-                    </xs:sequence>
-                    <xs:attribute type="xs:string" name="id" use="optional">
-                        <xs:simpleType >
-                            <xs:restriction base="xs:string">
-                                <xs:enumeration value="US"/>
-                                <xs:enumeration value="AFRICA"/>
-                                <xs:enumeration value="EUROPE"/>
-                                <xs:enumeration value="LATINAMERICA"/>
-                                <xs:enumeration value="MIDDLEEAST"/>
-                                <xs:enumeration value="ASIA"/>
-                            </xs:restriction>
-                        </xs:simpleType>
-                    </xs:attribute>
-                </xs:complexType>
-            </xs:element>
         </xs:sequence>
     </xs:complexType>
 </xs:element>

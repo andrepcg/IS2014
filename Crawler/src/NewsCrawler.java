@@ -133,7 +133,6 @@ public class NewsCrawler implements Runnable {
         while(this.on) {
 
             try {
-                System.out.println("asd");
                 logger.log("Fecthing news");
                 this.fetch();
                 data = this.pool.take();
