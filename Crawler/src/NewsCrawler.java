@@ -50,7 +50,8 @@ public class NewsCrawler implements Runnable {
 
         }else{
 
-        }
+
+       }
 
     }
 

@@ -35,17 +35,18 @@ import java.util.concurrent.TimeUnit;
  * Created by jmcalves275 on 03/10/14.
  */
 public class StatsProducer extends Thread {
-    NewsList listaNoticias;
-
+    NewsList listaNoticias=new NewsList();
+    HashMap<String,Integer> hashmap = new HashMap<String, Integer>();
     TopicSubscriber topicSubscriber;
     InitialContext ctx;
     Topic topic;
     TopicConnectionFactory connFactory;
-    TopicConnection topicConn;
+    TopicConnection topicConn=null;
     TopicSession topicSession;
     boolean check=false;
     public StatsProducer()  throws NamingException, JMSException {
         while(!initConection());
+
         new Reader(topicConn,topicSession,check).start();
         System.out.println("You are connected!");
     }
@@ -61,7 +62,7 @@ public class StatsProducer extends Thread {
             connFactory = (TopicConnectionFactory) ctx.lookup("jms/RemoteConnectionFactory");
 
             // create a topic connection
-            topicConn = connFactory.createTopicConnection("admin1", "admin");
+            topicConn = connFactory.createTopicConnection("admin", "admin1");
 
             topicConn.setClientID("admin1");
 
@@ -69,7 +70,7 @@ public class StatsProducer extends Thread {
             topicSession = topicConn.createTopicSession(false,Session.CLIENT_ACKNOWLEDGE);
 
             // create a topic subscriber
-            topicSubscriber=topicSession.createDurableSubscriber(topic, "MySub");
+            topicSubscriber=topicSession.createDurableSubscriber(topic, "subscriptor");
 
             topicConn.start();
 
@@ -104,7 +105,7 @@ public class StatsProducer extends Thread {
             topicConn.close();
 
 
-            topicConn = connFactory.createTopicConnection("admin1", "admin");
+            topicConn = connFactory.createTopicConnection("admin", "admin1");
 
             topicConn.setClientID("admin1");
 
@@ -113,13 +114,13 @@ public class StatsProducer extends Thread {
             TopicSession topicSession = topicConn.createTopicSession(false,Session.AUTO_ACKNOWLEDGE);
 
             // create a topic subscriber
-            topicSubscriber=topicSession.createDurableSubscriber(topic, "MySub");
+            topicSubscriber=topicSession.createDurableSubscriber(topic, "subscriptor");
 
             topicConn.start();
 
 
 
-            System.out.println("Connection to the topic retablished!");
+            System.out.println("Connection to the topic restablished!");
             return true;
         }catch(Exception e){
 
@@ -148,8 +149,8 @@ public class StatsProducer extends Thread {
                 System.out.println(doc);
 
 
-                checkFicheiro = validateXML("/Users/jmcalves275/Desktop/Faculdade/Mestrado/IS/Assignment_1/IS2014/Stats Producer/esquema.xsd", doc);
-
+                //checkFicheiro = validateXML("/Users/jmcalves275/Desktop/Faculdade/Mestrado/IS/Assignment_1/IS2014/Stats Producer/esquema.xsd", doc);
+                   checkFicheiro=true;
                 if (!checkFicheiro) {
                     System.out.println("O ficheiro XML é inválido");
 
@@ -186,30 +187,55 @@ public class StatsProducer extends Thread {
 
 
 
+        hashmap.put("U.S.", 0);
+        hashmap.put("Europe", 0);
+        hashmap.put("Africa", 0);
+        hashmap.put("Asia", 0);
+        hashmap.put("Latin America", 0);
+        hashmap.put("Middle East", 0);
 
 
-        for(int i=0;i<listaNoticias.getArticle().size();i++){
+        for (Iterator<Article> iterator = listaNoticias.getArticle().iterator(); iterator.hasNext();) {
+            Article a = iterator.next();
 
-            long x=(listaNoticias.getArticle().get(i).getTimestamp()).longValue();
+            long dataNoticia=(a.getTimestamp()).longValue();
 
-            Date startDate = new Date(x);
+            Date startDate = new Date(dataNoticia);
             Date endDate   =new Date(System.currentTimeMillis());
+
             long interval  = endDate.getTime() - startDate.getTime();
+
             interval=TimeUnit.MILLISECONDS.toMinutes(interval);
-            System.out.println("Tempo actual: "+endDate+" Tempo qda noticia: "+startDate+" Tempo duracao: "+interval+" Titulo: "+listaNoticias.getArticle().get(i).getTitle());
-            if (interval<(12*60))//converter 12 horas em minutos
-            {
-                System.out.println("oisd");
-                listaNoticias.getArticle().remove(listaNoticias.getArticle().get(i));
-                System.out.println("Print cenas: "+listaNoticias.getArticle().get(i).getTitle());
+
+            if (interval>12*60) {
+                // Remove the current element from the iterator and the list.
+                iterator.remove();
+            }
+        }
+
+      int numberNews=listaNoticias.getArticle().size();
+        for(Article a:listaNoticias.getArticle()){
+                hashmap.put(a.getSection(),hashmap.get(a.getSection())+1);
+
+        }
+        //escreve no ficheiro
+        try {
+            PrintWriter out = new PrintWriter("stats.txt");
+            out.println("Noticias com menos de 12 horas: "+numberNews);
+
+
+            out.println("Numero de noticias por categoria:");
+
+            for(String section:hashmap.keySet()){
+                out.println("\t"+section+":"+hashmap.get(section));
             }
 
+            out.println("Criado a: "+new Date(System.currentTimeMillis()));
+            out.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
 
-        }
-        for(int i=0;i<listaNoticias.getArticle().size();i++){
-            System.out.println("Cenas: "+listaNoticias.getArticle().get(i).getTitle());
-        }
-        //
 
     }
 
@@ -228,23 +254,25 @@ public class StatsProducer extends Thread {
         }
     }
     public void mergeLists(NewsList listaProvisoria){
-        listaNoticias=new NewsList();
-        listaNoticias.getArticle().add(listaProvisoria.getArticle().get(0));
-        boolean check;
-        for(int i=0;i<listaProvisoria.getArticle().size();i++ ){
-           System.out.println("Titulo: "+listaProvisoria.getArticle().get(i).getTitle()+" e na lista ta: "+listaNoticias.getArticle().get(0).getTitle()+" "+listaNoticias.getArticle().get(0).getAuthor());
 
-           check=listaNoticias.getArticle().contains(listaProvisoria.getArticle().get(i));
-            System.out.println(check);
-              if(check){
-                    System.out.print("MERDA: "+listaProvisoria.getArticle().get(i).getTitle());
-              }
-            else{
-                  listaNoticias.addArticle(listaProvisoria.getArticle().get(i));
-              }
+
+
+        for(Article prov : listaProvisoria.getArticle()){
+
+            boolean exists = false;
+            for(Article a : listaNoticias.getArticle()){
+                if(a.getTitle().equals(prov.getTitle())) {
+                    exists = true;
+                    break;
+                }
+            }
+
+            if(!exists)
+                listaNoticias.addArticle(prov);
 
 
         }
+
 
     }
     public static boolean validateXML(String xsdPath, String xmlPath){

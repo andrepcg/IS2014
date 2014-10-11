@@ -20,22 +20,22 @@ public class Reader extends  Thread {
     }
 
     public void run(){
+        while(true) {
+            Scanner sc = new Scanner(System.in);
+            if (sc.nextLine().compareTo("exit") == 0) {
+                check = true;
+                try {
+                    connection.close();
 
-        Scanner sc=new Scanner(System.in);
-        if(sc.nextLine().compareTo("exit")==0){
-            check=true;
-            try {
-                connection.close();
 
+                    System.exit(0);
+                } catch (JMSException e) {
+                    e.printStackTrace();
+                } catch (IllegalStateException e) {
+                    System.out.println("Erro: " + e.getMessage());
+                }
 
-                System.exit(0);
-            } catch (JMSException e) {
-                e.printStackTrace();
             }
-            catch(IllegalStateException e){
-                System.out.println("Erro: "+e.getMessage());
-            }
-
         }
     }
 }
