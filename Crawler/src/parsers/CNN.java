@@ -22,7 +22,7 @@ import java.util.Locale;
 public class CNN extends Parser {
     private static String[] sections = {"US", "AFRICA", "ASIA", "EUROPE", "LATINAMERICA", "MIDDLEEAST"};
     String baseUrl = "http://edition.cnn.com/";
-    String linkSelector = ".cnn_bulletbin a:not([href*=http]):not([href*=video]), .cnn_sectt2cntnt a, #cnn_maintoplive .cnn_relpostn a:first-of-type";
+    String linkSelector = "#cnn_mtt1rgtarea .cnn_bulletbin a:not([href*=http]):not([href*=video]), .cnn_sectt2cntnt a, #cnn_maintoplive .cnn_relpostn a:first-of-type";
 
 
     SimpleDateFormat dateParser = new SimpleDateFormat("MMMM dd, yyyy HHmm", Locale.ENGLISH);

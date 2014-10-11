@@ -49,7 +49,7 @@ public class JMS implements Runnable{
             if(this.producer)
                 topicPublisher = topicSession.createPublisher(topic);
             else
-                topicSubscriber=topicSession.createDurableSubscriber(topic, "MySub");
+                topicSubscriber=topicSession.createDurableSubscriber(topic, "sub");
 
             ctx = new InitialContext();
             topic = (Topic) ctx.lookup("jms/topic/project");
