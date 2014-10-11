@@ -13,7 +13,7 @@
                                     <xs:element type="xs:string" name="author" maxOccurs="unbounded" minOccurs="0"/>
                                     <xs:element minOccurs="0" maxOccurs="1" type="xs:string" name="corpus"/>
                                     <xs:element minOccurs="0" maxOccurs="1" name="section" type="xs:string">
-                                        <!--
+                                    <!--
 										<xs:simpleType >
 											<xs:restriction base="xs:string">
 												<xs:enumeration value="U.S."/>
@@ -24,7 +24,7 @@
 												<xs:enumeration value="ASIA"/>
 											</xs:restriction>
 										</xs:simpleType>
-                                        -->
+                                    -->
 									</xs:element>
                                 </xs:sequence>
                             </xs:complexType>
