@@ -34,7 +34,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * Created by jmcalves275 on 03/10/14.
  */
-public class StatsProducer {
+public class StatsProducer extends Thread {
     NewsList listaNoticias;
 
     TopicSubscriber topicSubscriber;
@@ -43,13 +43,15 @@ public class StatsProducer {
     TopicConnectionFactory connFactory;
     TopicConnection topicConn;
     TopicSession topicSession;
+    boolean check=false;
     public StatsProducer()  throws NamingException, JMSException {
         while(!initConection());
+        new Reader(topicConn,topicSession,check).start();
         System.out.println("You are connected!");
     }
     public boolean initConection(){
         try{
-            //topicConn.close();
+
             ctx = new InitialContext();
 
             // lookup the topic object
@@ -61,16 +63,15 @@ public class StatsProducer {
             // create a topic connection
             topicConn = connFactory.createTopicConnection("admin1", "admin");
 
-            topicConn.setClientID("admin4");
+            topicConn.setClientID("admin1");
 
             // create a topic session
             topicSession = topicConn.createTopicSession(false,Session.CLIENT_ACKNOWLEDGE);
 
             // create a topic subscriber
-            topicSubscriber=topicSession.createDurableSubscriber(topic, "topic1");
+            topicSubscriber=topicSession.createDurableSubscriber(topic, "MySub");
 
             topicConn.start();
-
 
 
 
@@ -101,17 +102,18 @@ public class StatsProducer {
 
         try{
             topicConn.close();
-            // create a topic connection
-            //connFactory = (TopicConnectionFactory) ctx.lookup("jms/RemoteConnectionFactory");
+
+
             topicConn = connFactory.createTopicConnection("admin1", "admin");
 
             topicConn.setClientID("admin1");
 
             // create a topic session
+
             TopicSession topicSession = topicConn.createTopicSession(false,Session.AUTO_ACKNOWLEDGE);
 
             // create a topic subscriber
-            topicSubscriber=topicSession.createDurableSubscriber(topic, "topic1");
+            topicSubscriber=topicSession.createDurableSubscriber(topic, "MySub");
 
             topicConn.start();
 
@@ -133,7 +135,7 @@ public class StatsProducer {
     }
     public void receive(){
 
-        boolean checkFicheiro=false;
+        boolean checkFicheiro;
         while(true) {
             try {
 
@@ -146,25 +148,34 @@ public class StatsProducer {
                 System.out.println(doc);
 
 
-                checkFicheiro = validateXML("/Users/jmcalves275/Desktop/Faculdade/Mestrado/IS/Assignment_1/IS2014/Stats Producer/esquema.xsd", "/Users/jmcalves275/Desktop/Faculdade/Mestrado/IS/Assignment_1/IS2014/Stats Producer/filename.xml");
+                checkFicheiro = validateXML("/Users/jmcalves275/Desktop/Faculdade/Mestrado/IS/Assignment_1/IS2014/Stats Producer/esquema.xsd", doc);
 
                 if (!checkFicheiro) {
                     System.out.println("O ficheiro XML é inválido");
-                    receive();
+
                 } else {
                     unmarshal(doc);
                     produceStats();
 
                 }
             } catch (JMSException e) {
-                //System.out.println(e.getMessage());
-                while (!retryConnection()) ;
-                //receive();
+                try {
+                    Thread.sleep(5000);
+                } catch (InterruptedException e1) {
+                    e1.printStackTrace();
+                }
+                while (!check && !retryConnection()  ) ;
+
 
 
             } catch (NullPointerException e) {
-                while (!retryConnection()) ;
-                //receive();
+                try {
+                    Thread.sleep(5000);
+                } catch (InterruptedException e1) {
+                    e1.printStackTrace();
+                }
+                while (!check && !retryConnection() ) ;
+
 
             }
         }
@@ -174,7 +185,7 @@ public class StatsProducer {
     public void produceStats(){
 
 
-        long timestamp=System.currentTimeMillis();
+
 
 
         for(int i=0;i<listaNoticias.getArticle().size();i++){
@@ -242,7 +253,8 @@ public class StatsProducer {
             SchemaFactory factory =SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
             Schema schema = factory.newSchema(new File(xsdPath));
             Validator validator = schema.newValidator();
-            validator.validate(new StreamSource(new File(xmlPath)));
+            StringReader reader = new StringReader(xmlPath);
+            validator.validate(new StreamSource(reader));
         } catch (IOException e) {
             System.out.println("Exception: "+e.getMessage());
             return false;
@@ -252,24 +264,13 @@ public class StatsProducer {
         }
         return true;
     }
-    public void close(){
 
-        try {
-
-            topicSubscriber.close();
-
-            System.exit(0);
-
-        } catch (JMSException e) {
-            e.printStackTrace();
-        }
-    }
     public static void main(String[] args) throws JMSException, NamingException {
 
         StatsProducer statsProducer = new StatsProducer();
 
         statsProducer.receive();
-        statsProducer.close();
+
 
 
     }
