@@ -54,7 +54,9 @@ public class NewsList {
 
     @XmlElement(required = true)
     protected List<Article> article;
+    public NewsList(){
 
+    }
     /**
      * Gets the value of the article property.
      *
@@ -90,5 +92,12 @@ public class NewsList {
 
         return false;
     }
+    public Boolean removeArticle(Article a){
+        if(article != null)
+            return article.remove(a);
+
+        return false;
+    }
+
 
 }
