@@ -4,6 +4,7 @@
 import javax.jms.*;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
+import java.util.Scanner;
 
 
 public class JMS implements Runnable{
@@ -95,6 +96,7 @@ public class JMS implements Runnable{
         while (keepConnecting){
             if(!connected)
                 connected = connect();
+
             try {
                 Thread.sleep(5000);
             } catch (InterruptedException e) {
