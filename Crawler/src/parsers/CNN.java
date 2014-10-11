@@ -122,8 +122,8 @@ public class CNN extends Parser {
             a.setCorpus(story.select(".cnn_storypgraphtxt").text());
             a.setImage(doc.select("head meta[itemprop=thumbnailUrl]").attr("content"));
             a.setUrl(doc.select("head meta[property=vr:canonical]").attr("content"));
-            //a.setSection(doc.select("#intl-menu [class=nav-on]").text());
-            a.setSection("U.S.");
+            a.setSection(doc.select("#intl-menu [class=nav-on]").text());
+            //a.setSection("U.S.");
 
             String video = doc.select(".OUTBRAIN").attr("data-src");
             if(video != null && video != ""){

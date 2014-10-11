@@ -32,12 +32,12 @@ public class NewsCrawler implements Runnable {
     public NewsCrawler() {
         this.pool = new LinkedBlockingQueue<String>();
         this.c = new Crawler();
-        this.jms = new JMS("topico", "admin", "admin1");
+        this.jms = new JMS("topico", "admin", "admin1", true);
         (new Thread(jms)).start();
     }
 
     private void fetch(){
-        if((n = this.c.crawl("CNN", 1)) != null)
+        if((n = this.c.crawl("CNN", 7)) != null)
             populateNewsList(this.n);
         else
             logger.log("Crawling error");
