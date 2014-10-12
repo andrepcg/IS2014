@@ -25,6 +25,8 @@
          <div class="row">
             <div class="col-sm-12">
 
+              <div id="placeholder"></div>
+
                 <div class="btn-group" data-toggle="buttons">
                   <label class="btn btn-primary">
                     <input type="checkbox" name="options" id="us" data-section="U.S."> U.S.
@@ -32,9 +34,21 @@
                   <label class="btn btn-primary">
                     <input type="checkbox" name="options" id="africa" data-section="Africa"> Africa
                   </label>
+                  <label class="btn btn-primary">
+                    <input type="checkbox" name="options" id="africa" data-section="Asia"> Africa
+                  </label>
+                  <label class="btn btn-primary">
+                    <input type="checkbox" name="options" id="africa" data-section="Europe"> Africa
+                  </label>
+                  <label class="btn btn-primary">
+                    <input type="checkbox" name="options" id="africa" data-section="Latin America"> Africa
+                  </label>
+                  <label class="btn btn-primary">
+                    <input type="checkbox" name="options" id="africa" data-section="Middle East"> Africa
+                  </label>
                 </div>
 
-               <div class="noticia categoria_ciencia">
+               <div class="noticia categoria_ciencia" >
                   <div class="row">
                      <div class="col-sm-3">
                         <div class="img-rounded center-cropped" style="background-image: url(http://i2.cdn.turner.com/cnn/dam/assets/141009063906-arizona-bees-attack-one-dead-four-injured-00003812-story-top.jpg)"></div>
@@ -59,7 +73,7 @@
                      </div>
                   </div>
                </div>
-               <div class="noticia categoria_ciencia">
+               <div class="noticia categoria_ciencia" data-cat="U.S.">
                   <div class="row">
                      <div class="col-sm-3">
                         <div class="img-rounded center-cropped" style="background-image: url(http://i2.cdn.turner.com/cnn/dam/assets/141009063906-arizona-bees-attack-one-dead-four-injured-00003812-story-top.jpg)"></div>
@@ -509,7 +523,7 @@
                      </div>
                   </div>
                </div>
-               <div class="noticia categoria_ciencia">
+               <div class="noticia categoria_ciencia" data-cat="Africa">
                   <div class="row">
                      <div class="col-sm-3">
                         <div class="img-rounded center-cropped" style="background-image: url(http://i2.cdn.turner.com/cnn/dam/assets/141007184411-orig-sn-1008-00084607-story-top.jpg)"></div>
@@ -536,77 +550,69 @@
                </div>
             </div>
          </div>
-      </div><script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script><script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script><script>
+      </div>
+      <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+      <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
 
-    $( document ).ready(function() {
+      <script>
 
-      $("input").change(function(){
-        var l = [];
-        $("input:checked").each(function(){
-          l.push($(this).attr("data-section"));
+
+        $( document ).ready(function() {
+
+          $("input").change(function(){
+            var l = [];
+            $("input:checked").each(function(){
+              l.push($(this).attr("data-section"));
+            });
+
+            if(l.length === 0){
+              setVisible(["U.S.", "Africa", "Middle East", "Europe", "Asia", "Latin America"], true);
+            }
+            else{
+
+              setVisible(l.length > 1 ? l : l[0], true);
+
+              var l2 = [];
+              $("input:not(:checked)").each(function(){
+                l2.push($(this).attr("data-section"));
+              });
+              setVisible(l2.length > 1 ? l2 : l2[0], false);
+            }
+          });
+
+          var setVisible = function(section, visible){
+            if(typeof section === "string"){
+              $(".noticia .categoria[data-cat='"+section+"']").each(function() {
+                if(visible)
+                  $( this ).closest(".noticia").removeClass("hidden");
+                else
+                  $( this ).closest(".noticia").addClass("hidden");
+              });
+            }
+            else if(typeof section === "object" && section.length > 0){
+              var f = ".noticia .categoria[data-cat='XXX']";
+              var q = "";
+              section.forEach(function(sec){
+                  q += f.replace("XXX", sec) + ", ";
+              });
+
+              q = q.substr(0, q.length - 2);
+
+              $(q).each(function() {
+                if(visible)
+                  $( this ).closest(".noticia").removeClass("hidden");
+                else
+                  $( this ).closest(".noticia").addClass("hidden");
+              });
+            }
+          };
+
+
         });
-        setVisible(l.length > 1 ? l : l[0]);
-
-        var l2 = [];
-        $("input:not(:checked)").each(function(){
-          l2.push($(this).attr("data-section"));
-        });
-        setInvisible(l2.length > 1 ? l2 : l2[0]);
-      });
-
-      $("#button[data-section='U.S.']").click(function(){
-        var cat = $(this).attr("data-section");
-
-        $(".noticia .categoria[data-cat!='"+cat+"']").each(function() {
-          $( this ).closest(".noticia").addClass("hidden");
-        });
-      });
-
-      var setVisible = function(section){
-        if(typeof section === "string"){
-          $(".noticia .categoria[data-cat='"+section+"']").each(function() {
-            $( this ).closest(".noticia").removeClass("hidden");
-          });
-        }
-        else if(typeof section === "object" && section.length > 0){
-          var f = ".noticia .categoria[data-cat='qwerty']";
-          var q = "";
-          section.forEach(function(sec){
-              q += f.replace("qwerty", sec) + ", ";
-          });
-
-          q = q.substr(0, q.length - 2);
-
-          $(q).each(function() {
-            $( this ).closest(".noticia").removeClass("hidden");
-          });
-        }
-      };
-
-      var setInvisible = function(section){
-        if(typeof section === "string"){
-          $(".noticia .categoria[data-cat='"+section+"']").each(function() {
-            $( this ).closest(".noticia").addClass("hidden");
-          });
-        }
-        else if(typeof section === "object" && section.length > 0){
-          var f = ".noticia .categoria[data-cat='qwerty']";
-          var q = "";
-          section.forEach(function(sec){
-              q += f.replace("qwerty", sec) + ", ";
-          });
-
-          q = q.substr(0, q.length - 2);
-
-          $(q).each(function() {
-            $( this ).closest(".noticia").addClass("hidden");
-          });
-        }
-      };
-
-    });
 
     
     
-  </script></body>
+  </script>
+
+  </body>
 </html>
