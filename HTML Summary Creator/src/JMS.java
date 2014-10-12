@@ -75,7 +75,7 @@ public class JMS implements Runnable{
     }
 
     public boolean send(String xmlString){
-        if(this.producer) {
+        if(this.producer && this.connected) {
             try {
 
                 Message message = null;

@@ -3,14 +3,17 @@ import org.xml.sax.SAXException;
 import sun.misc.Signal;
 import sun.misc.SignalHandler;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.StringWriter;
+import java.io.*;
+import java.lang.reflect.Array;
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.LinkedBlockingQueue;
 import javax.xml.*;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
@@ -22,6 +25,7 @@ public class NewsCrawler implements Runnable {
     public static Logger logger = new Logger("testeapp");
 
     private String xsdFile = "scheme.xsd";
+    private String failedFolder = ".\\failed\\";
     private Boolean on = true;
 
     private Crawler c;
@@ -29,15 +33,17 @@ public class NewsCrawler implements Runnable {
     private LinkedBlockingQueue<String> pool;
     private NewsList n;
 
+
     public NewsCrawler() {
         this.pool = new LinkedBlockingQueue<String>();
         this.c = new Crawler();
         this.jms = new JMS("topico", "admin", "admin1", true);
+
         (new Thread(jms)).start();
     }
 
     private void fetch(){
-        if((n = this.c.crawl("CNN", 7)) != null)
+        if((n = this.c.crawl("CNN", 1)) != null)
             populateNewsList(this.n);
         else
             logger.log("Crawling error");
@@ -47,12 +53,60 @@ public class NewsCrawler implements Runnable {
         if(!jms.send(xml)) {
             logger.log("Send failed");
             this.pool.add(xml);
-
+            saveXML(xml);
         }else{
 
 
        }
 
+    }
+
+    private String saveXML(String xml){
+        String xmlFile = "out_" + System.currentTimeMillis() + ".xml";
+        BufferedWriter fW;
+
+        try {
+            fW = new BufferedWriter(new FileWriter(failedFolder + xmlFile));
+            fW.write(xml, 0, xml.length());
+            fW.newLine();
+            fW.close();
+            logger.log("XML saved " + xmlFile);
+            return xmlFile;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    private void loadFailed() {
+
+        File directory  = new File(this.failedFolder);
+        File[] listOfFiles = directory.listFiles();
+
+        for(File file: listOfFiles) {
+            if (file.isFile() && file.getName().endsWith(".xml")) {;
+                //this.logger.log(file.getName() + Logger.loadingQueue);
+                this.n = getNewsList(this.failedFolder + file.getName());
+                this.populateNewsList(n);
+                //this.logger.log(file.getName() + Logger.loadedQueue);
+                file.delete();
+            }
+        }
+    }
+
+    private NewsList getNewsList(String xmlFile) {
+        NewsList nl = null;
+
+        try {
+            JAXBContext jc = JAXBContext.newInstance(NewsList.class);
+            Unmarshaller u = jc.createUnmarshaller();
+            nl = (NewsList)u.unmarshal( new File(xmlFile) );
+        } catch (JAXBException e) {
+            e.printStackTrace();
+        }
+
+        return nl;
     }
 
 
@@ -77,7 +131,6 @@ public class NewsCrawler implements Runnable {
         if (this.validateXML(sw.toString())) {
             this.pool.add(sw.toString());
 
-            //this.logger.log(Logger.poolSize + this.pool.size());
         }
     }
 
@@ -85,7 +138,7 @@ public class NewsCrawler implements Runnable {
 
         try {
             SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-            Schema schema = factory.newSchema(new StreamSource("/Users/jmcalves275/Desktop/Faculdade/Mestrado/IS/Assignment_1/IS2014/Crawler/scheme.xsd"));
+            Schema schema = factory.newSchema(new StreamSource("scheme.xsd"));
 
             Validator validator = schema.newValidator();
             validator.validate(new StreamSource(new ByteArrayInputStream(xml.getBytes())));
@@ -122,7 +175,7 @@ public class NewsCrawler implements Runnable {
         }
 
         if (crawler != null) {
-            //crawler.loadQueue();
+            crawler.loadFailed();
             (new Thread(crawler)).start();
 
         }
