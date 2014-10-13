@@ -21,7 +21,7 @@ import java.sql.Timestamp;
  */
 public class HTMLSummaryCreator implements Runnable{
 
-    private final String XSL = "";
+    private final String XSL = "html.xsl";
     private JMS jms;
     private boolean on = true;
 
@@ -36,13 +36,13 @@ public class HTMLSummaryCreator implements Runnable{
         }
 
         if (summary != null) {
-            //crawler.loadQueue();
-            (new Thread(summary)).start();
+            summary.generateHTML("123","out_1413207418677.xml");
+            //(new Thread(summary)).start();
         }
     }
 
     public HTMLSummaryCreator(){
-        this.jms = new JMS("jms/topic/project", "admin", "admin1", false);
+        this.jms = new JMS("jms/topic/project", "admin", "admin1", false, "SummaryCreator");
         (new Thread(jms)).start();
     }
 
@@ -95,8 +95,10 @@ public class HTMLSummaryCreator implements Runnable{
             transformer.transform(text, new StreamResult(html));
 
         } catch (TransformerConfigurationException e) {
+            e.printStackTrace();
             return false;
         } catch (TransformerException e) {
+            e.printStackTrace();
             return false;
         }
         return true;

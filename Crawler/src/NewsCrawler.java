@@ -37,7 +37,7 @@ public class NewsCrawler implements Runnable {
     public NewsCrawler() {
         this.pool = new LinkedBlockingQueue<String>();
         this.c = new Crawler();
-        this.jms = new JMS("topico", "admin", "admin1", true);
+        this.jms = new JMS("topico", "admin", "admin1", true, "Crawler");
 
         (new Thread(jms)).start();
     }
@@ -82,6 +82,7 @@ public class NewsCrawler implements Runnable {
     private void loadFailed() {
 
         File directory  = new File(this.failedFolder);
+        directory.mkdir();
         File[] listOfFiles = directory.listFiles();
 
         for(File file: listOfFiles) {

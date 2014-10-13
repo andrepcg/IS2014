@@ -1,7 +1,4 @@
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.*;
 import java.sql.Timestamp;
 import java.util.Date;
 
@@ -12,6 +9,8 @@ public class Logger {
     private String logFolder = ".\\logs\\";
 
     public Logger(String nome) {
+        (new File(logFolder)).mkdir();
+
         String timestamp = new Timestamp((new java.util.Date()).getTime()).toString();
 
         try {

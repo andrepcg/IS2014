@@ -9,7 +9,7 @@ import java.util.Scanner;
 
 public class JMS implements Runnable{
 
-    private String topic, user, password;
+    private String topic, user, password, clientID;
 
 
     private TopicConnection topicConn;
@@ -25,11 +25,12 @@ public class JMS implements Runnable{
 
     private boolean keepConnecting = true;
 
-    public JMS(String topic, String user, String password, Boolean producer) {
+    public JMS(String topic, String user, String password, Boolean producer, String clientID) {
         this.topic = topic;
         this.user = user;
         this.password = password;
         this.producer = producer;
+        this.clientID = clientID;
         connected = connect();
 
     }
@@ -41,7 +42,7 @@ public class JMS implements Runnable{
 
             TopicConnectionFactory connFactory = (TopicConnectionFactory) ctx.lookup("jms/RemoteConnectionFactory");
             topicConn = connFactory.createTopicConnection(user, password);
-            topicConn.setClientID("peddy");
+            topicConn.setClientID(clientID);
             topicConn.start();
 
             topicSession = topicConn.createTopicSession(false, Session.AUTO_ACKNOWLEDGE);
@@ -49,19 +50,8 @@ public class JMS implements Runnable{
             if(this.producer)
                 topicPublisher = topicSession.createPublisher(topic);
             else
-                topicSubscriber=topicSession.createDurableSubscriber(topic, "sub");
-
-            ctx = new InitialContext();
-            topic = (Topic) ctx.lookup("jms/topic/project");
-            connFactory = (TopicConnectionFactory) ctx.lookup("jms/RemoteConnectionFactory");
-            topicConn = connFactory.createTopicConnection(user, password);
-            topicConn.setClientID("peddy");
-            topicConn.start();
-            topicSession = topicConn.createTopicSession(false,Session.CLIENT_ACKNOWLEDGE);
-            if(this.producer)
-                topicPublisher = topicSession.createPublisher(topic);
-            else
                 topicSubscriber=topicSession.createDurableSubscriber(topic, "MySub");
+
 
         }catch(JMSException e){
             System.out.println("Server is down! " + e.toString());

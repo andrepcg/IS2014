@@ -48,22 +48,22 @@
 
       	<div class="btn-group" data-toggle="buttons">
                   <label class="btn btn-primary">
-                    <input type="checkbox" name="options" id="us" data-section="U.S."> U.S.
+                    <input type="checkbox" name="options" id="us" data-section="U.S."/> U.S.
                   </label>
                   <label class="btn btn-primary">
-                    <input type="checkbox" name="options" id="africa" data-section="Africa"> Africa
+                    <input type="checkbox" name="options" id="africa" data-section="Africa"/> Africa
                   </label>
                   <label class="btn btn-primary">
-                    <input type="checkbox" name="options" id="africa" data-section="Asia"> Africa
+                    <input type="checkbox" name="options" id="asia" data-section="Asia"/> Asia
                   </label>
                   <label class="btn btn-primary">
-                    <input type="checkbox" name="options" id="africa" data-section="Europe"> Africa
+                    <input type="checkbox" name="options" id="europe" data-section="Europe"/> Europe
                   </label>
                   <label class="btn btn-primary">
-                    <input type="checkbox" name="options" id="africa" data-section="Latin America"> Africa
+                    <input type="checkbox" name="options" id="latinamerica" data-section="Latin America"/> Latin America
                   </label>
                   <label class="btn btn-primary">
-                    <input type="checkbox" name="options" id="africa" data-section="Middle East"> Africa
+                    <input type="checkbox" name="options" id="middleeast" data-section="Middle East"/> Middle East
                   </label>
                 </div>
 
@@ -113,64 +113,7 @@
 
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
-  
-  <script>
-
-            $( document ).ready(function() {
-
-          $("input").change(function(){
-            var l = [];
-            $("input:checked").each(function(){
-              l.push($(this).attr("data-section"));
-            });
-
-            if(l.length === 0){
-              setVisible(["U.S.", "Africa", "Middle East", "Europe", "Asia", "Latin America"], true);
-            }
-            else{
-
-              setVisible(l.length > 1 ? l : l[0], true);
-
-              var l2 = [];
-              $("input:not(:checked)").each(function(){
-                l2.push($(this).attr("data-section"));
-              });
-              setVisible(l2.length > 1 ? l2 : l2[0], false);
-            }
-          });
-
-          var setVisible = function(section, visible){
-            if(typeof section === "string"){
-              $(".noticia .categoria[data-cat='"+section+"']").each(function() {
-                if(visible)
-                  $( this ).closest(".noticia").removeClass("hidden");
-                else
-                  $( this ).closest(".noticia").addClass("hidden");
-              });
-            }
-            else if(typeof section === "object" && section.length > 0){
-              var f = ".noticia .categoria[data-cat='XXX']";
-              var q = "";
-              section.forEach(function(sec){
-                  q += f.replace("XXX", sec) + ", ";
-              });
-
-              q = q.substr(0, q.length - 2);
-
-              $(q).each(function() {
-                if(visible)
-                  $( this ).closest(".noticia").removeClass("hidden");
-                else
-                  $( this ).closest(".noticia").addClass("hidden");
-              });
-            }
-          };
-
-
-        });
-    
-    
-  </script>
+    <script src="script.js"></script>
   </body>
 </html>
 </xsl:template>
