@@ -9,12 +9,13 @@ import java.util.Date;
 public class Logger {
 
     private PrintWriter pw;
+    private String logFolder = ".\\logs\\";
 
     public Logger(String nome) {
         String timestamp = new Timestamp((new java.util.Date()).getTime()).toString();
 
         try {
-            pw = new PrintWriter(new BufferedWriter(new FileWriter("log_"+nome+"_"+System.currentTimeMillis()+".txt")));
+            pw = new PrintWriter(new BufferedWriter(new FileWriter(logFolder + "log_"+nome+"_"+System.currentTimeMillis()+".txt")));
         } catch (IOException e) {
             e.printStackTrace();
         }
