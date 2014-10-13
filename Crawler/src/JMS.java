@@ -49,19 +49,9 @@ public class JMS implements Runnable{
             if(this.producer)
                 topicPublisher = topicSession.createPublisher(topic);
             else
-                topicSubscriber=topicSession.createDurableSubscriber(topic, "MySub");
+                topicSubscriber=topicSession.createDurableSubscriber(topic, "sub");
 
-            ctx = new InitialContext();
-            topic = (Topic) ctx.lookup("jms/topic/project");
-            connFactory = (TopicConnectionFactory) ctx.lookup("jms/RemoteConnectionFactory");
-            topicConn = connFactory.createTopicConnection(user, password);
-            topicConn.setClientID("peddy");
-            topicConn.start();
-            topicSession = topicConn.createTopicSession(false,Session.CLIENT_ACKNOWLEDGE);
-            if(this.producer)
-                topicPublisher = topicSession.createPublisher(topic);
-            else
-                topicSubscriber=topicSession.createDurableSubscriber(topic, "MySub");
+
 
         }catch(JMSException e){
             System.out.println("Server is down! " + e.toString());
@@ -82,6 +72,7 @@ public class JMS implements Runnable{
                 message = topicSession.createMessage();
                 message.setStringProperty("xml", xmlString);
                 topicPublisher.publish(message);
+                topicConn.close();
             } catch (JMSException e) {
                 e.printStackTrace();
                 return false;

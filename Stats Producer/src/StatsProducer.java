@@ -67,12 +67,13 @@ public class StatsProducer extends Thread {
             topicConn.setClientID("admin1");
 
             // create a topic session
-            topicSession = topicConn.createTopicSession(false,Session.CLIENT_ACKNOWLEDGE);
+            topicConn.start();
+            topicSession = topicConn.createTopicSession(false,Session.AUTO_ACKNOWLEDGE);
 
             // create a topic subscriber
             topicSubscriber=topicSession.createDurableSubscriber(topic, "sub");
 
-            topicConn.start();
+
 
 
 
@@ -146,7 +147,7 @@ public class StatsProducer extends Thread {
                 String doc = m.getStringProperty("xml");
 
                 System.out.println("Messages received from topic!\n");
-                System.out.println(doc);
+                //System.out.println(doc);
 
 
                 checkFicheiro = validateXML("/Users/jmcalves275/Desktop/Faculdade/Mestrado/IS/Assignment_1/IS2014/Stats Producer/scheme.xsd", doc);
@@ -165,7 +166,7 @@ public class StatsProducer extends Thread {
                 }
             } catch (JMSException e) {
                 try {
-                    Thread.sleep(5000);
+                    Thread.sleep(7000);
                 } catch (InterruptedException e1) {
                     e1.printStackTrace();
                 }
@@ -175,7 +176,7 @@ public class StatsProducer extends Thread {
 
             } catch (NullPointerException e) {
                 try {
-                    Thread.sleep(5000);
+                    Thread.sleep(7000);
                 } catch (InterruptedException e1) {
                     e1.printStackTrace();
                 }

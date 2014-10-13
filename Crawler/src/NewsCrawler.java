@@ -37,7 +37,7 @@ public class NewsCrawler implements Runnable {
     public NewsCrawler() {
         this.pool = new LinkedBlockingQueue<String>();
         this.c = new Crawler();
-        this.jms = new JMS("topico", "admin", "admin1", true);
+        this.jms = new JMS("jms/topic/project", "admin", "admin1", true);
 
         (new Thread(jms)).start();
     }
@@ -138,7 +138,7 @@ public class NewsCrawler implements Runnable {
 
         try {
             SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-            Schema schema = factory.newSchema(new StreamSource("scheme.xsd"));
+            Schema schema = factory.newSchema(new StreamSource("/Users/jmcalves275/Desktop/Faculdade/Mestrado/IS/Assignment_1/IS2014/Crawler/scheme.xsd"));
 
             Validator validator = schema.newValidator();
             validator.validate(new StreamSource(new ByteArrayInputStream(xml.getBytes())));
@@ -175,7 +175,7 @@ public class NewsCrawler implements Runnable {
         }
 
         if (crawler != null) {
-            crawler.loadFailed();
+            //crawler.loadFailed();
             (new Thread(crawler)).start();
 
         }
