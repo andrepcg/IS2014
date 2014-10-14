@@ -9,6 +9,7 @@
                                     <xs:element minOccurs="0" maxOccurs="1" type="xs:string" name="title"/>
                                     <xs:element minOccurs="0" maxOccurs="1" type="xs:anyURI" name="url"/>
                                     <xs:element minOccurs="0" maxOccurs="1" type="xs:anyURI" name="image"/>
+                                    <xs:element minOccurs="0" maxOccurs="1" type="xs:anyURI" name="video"/>
                                     <xs:element minOccurs="0" maxOccurs="1" type="xs:positiveInteger" name="timestamp"/>
                                     <xs:element type="xs:string" name="author" maxOccurs="unbounded" minOccurs="0"/>
                                     <xs:element minOccurs="0" maxOccurs="1" type="xs:string" name="corpus"/>

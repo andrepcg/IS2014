@@ -24,6 +24,7 @@ public class Logger {
         String time = new Timestamp(new java.util.Date().getTime()).toString();
         pw.write("[ " + time + " ] - " + l + "\n");
         pw.flush();
+        System.out.println("[ " + time + " ] - " + l);
     }
 
 

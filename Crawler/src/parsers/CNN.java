@@ -41,6 +41,11 @@ public class CNN extends Parser {
                 doc = getFromURL(baseUrl + sections[i]);
                 a = parseNews(doc.select(linkSelector), baseUrl);
                 novo.getArticle().addAll(a.getArticle());
+
+                for(Article art : novo.getArticle()){
+                    if(art.getSection() == null || art.getSection().equals(""))
+                        art.setSection(sections[i]);
+                }
             }
 
             return novo;
@@ -123,11 +128,12 @@ public class CNN extends Parser {
             a.setImage(doc.select("head meta[itemprop=thumbnailUrl]").attr("content"));
             a.setUrl(doc.select("head meta[property=vr:canonical]").attr("content"));
             a.setSection(doc.select("#intl-menu [class=nav-on]").text());
-            //a.setSection("U.S.");
+
 
             String video = doc.select(".OUTBRAIN").attr("data-src");
-            if(video != null && video != ""){
+            if(video != null && !video.equals("")){
                 String v = "http://ht.cdn.turner.com/cnn/big" + getVideo(video + "?xml=true");
+                a.setVideo(v);
             }
 
             return a;

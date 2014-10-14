@@ -43,9 +43,10 @@ public class NewsCrawler implements Runnable {
     }
 
     private void fetch(){
-        if((n = this.c.crawl("CNN", 1)) != null)
+        if((n = this.c.crawl("CNN", 7)) != null) {
+            logger.log("Crawling finished");
             populateNewsList(this.n);
-        else
+        }else
             logger.log("Crawling error");
     }
 
@@ -84,16 +85,20 @@ public class NewsCrawler implements Runnable {
         File directory  = new File(this.failedFolder);
         directory.mkdir();
         File[] listOfFiles = directory.listFiles();
-
+        if(listOfFiles.length > 0)
+            logger.log("Loading failed XML files...");
         for(File file: listOfFiles) {
+
             if (file.isFile() && file.getName().endsWith(".xml")) {;
-                //this.logger.log(file.getName() + Logger.loadingQueue);
+                logger.log("Loading " + file.getName());
                 this.n = getNewsList(this.failedFolder + file.getName());
                 this.populateNewsList(n);
                 //this.logger.log(file.getName() + Logger.loadedQueue);
                 file.delete();
             }
         }
+        if(listOfFiles.length > 0)
+            logger.log("XML files loaded");
     }
 
     private NewsList getNewsList(String xmlFile) {
