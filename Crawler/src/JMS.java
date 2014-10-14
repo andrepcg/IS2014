@@ -41,7 +41,7 @@ public class JMS implements Runnable{
 
             TopicConnectionFactory connFactory = (TopicConnectionFactory) ctx.lookup("jms/RemoteConnectionFactory");
             topicConn = connFactory.createTopicConnection(user, password);
-            topicConn.setClientID("peddy");
+            //topicConn.setClientID("peddy");
             topicConn.start();
 
             topicSession = topicConn.createTopicSession(false, Session.AUTO_ACKNOWLEDGE);
