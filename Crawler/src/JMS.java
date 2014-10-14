@@ -33,6 +33,9 @@ public class JMS implements Runnable{
         this.clientID = clientID;
         connected = connect();
 
+        if(connected)
+            System.out.println("JMS connected");
+
     }
 
     private boolean connect(){
@@ -41,6 +44,7 @@ public class JMS implements Runnable{
             Topic topic = (Topic) ctx.lookup(this.topic);
 
             TopicConnectionFactory connFactory = (TopicConnectionFactory) ctx.lookup("jms/RemoteConnectionFactory");
+
             topicConn = connFactory.createTopicConnection(user, password);
             topicConn.setClientID(clientID);
             topicConn.start();
@@ -53,8 +57,10 @@ public class JMS implements Runnable{
                 topicSubscriber=topicSession.createDurableSubscriber(topic, "MySub");
 
 
+
         }catch(JMSException e){
-            System.out.println("Server is down! " + e.toString());
+            //System.out.println("Server is down! " + e.toString());
+            e.printStackTrace();
             return false;
         }catch(NamingException e){
             System.out.println("Server is down! 1 " + e.toString());

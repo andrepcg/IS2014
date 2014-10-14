@@ -9,6 +9,7 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.LinkedBlockingQueue;
+import javax.naming.Context;
 import javax.xml.*;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -37,7 +38,7 @@ public class NewsCrawler implements Runnable {
     public NewsCrawler() {
         this.pool = new LinkedBlockingQueue<String>();
         this.c = new Crawler();
-        this.jms = new JMS("topico", "admin", "admin1", true, "Crawler");
+        this.jms = new JMS("jms/topic/project", "admin", "admin1", true, "Crawler");
 
         (new Thread(jms)).start();
     }
