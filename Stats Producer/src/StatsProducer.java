@@ -37,6 +37,7 @@ import java.util.concurrent.TimeUnit;
 public class StatsProducer extends Thread {
     NewsList listaNoticias=new NewsList();
     HashMap<String,Integer> hashmap = new HashMap<String, Integer>();
+    Reader keyboardReader;
     TopicSubscriber topicSubscriber;
     InitialContext ctx;
     Topic topic;
@@ -47,7 +48,8 @@ public class StatsProducer extends Thread {
     public StatsProducer()  throws NamingException, JMSException {
         while(!initConection());
 
-        new Reader(topicConn,topicSession,check).start();
+        keyboardReader=new Reader(topicConn,topicSession,check);
+        keyboardReader.start();
         System.out.println("You are connected!");
     }
     public boolean initConection(){
@@ -67,18 +69,19 @@ public class StatsProducer extends Thread {
             topicConn.setClientID("admin1");
 
             // create a topic session
-            topicSession = topicConn.createTopicSession(false,Session.CLIENT_ACKNOWLEDGE);
+            topicConn.start();
+            topicSession = topicConn.createTopicSession(false,Session.AUTO_ACKNOWLEDGE);
 
             // create a topic subscriber
             topicSubscriber=topicSession.createDurableSubscriber(topic, "sub");
 
-            topicConn.start();
+
 
 
 
         }catch(JMSException e){
-
-            System.out.println("Can't establish connection to the server. We'll retry in 5 seconds");
+            System.out.println("erro: "+e.toString());
+            //System.out.println("Can't establish connection to the server. We'll retry in 5 seconds");
             try{
                 Thread.sleep(5000);
             }catch(InterruptedException s){
@@ -87,8 +90,8 @@ public class StatsProducer extends Thread {
             return false;
 
         }catch(NamingException e){
-
-            System.out.println("Can't establish connection to the server. We'll retry in 5 seconds");
+             System.out.println("erro: "+e.toString());
+            //System.out.println("Can't establish connection to the server. We'll retry in 5 seconds");
             try{
                 Thread.sleep(5000);
             }catch(InterruptedException s){
@@ -105,18 +108,18 @@ public class StatsProducer extends Thread {
             topicConn.close();
 
 
+
             topicConn = connFactory.createTopicConnection("admin", "admin1");
 
             topicConn.setClientID("admin1");
 
-            // create a topic session
+            topicConn.start();
 
             TopicSession topicSession = topicConn.createTopicSession(false,Session.AUTO_ACKNOWLEDGE);
 
             // create a topic subscriber
             topicSubscriber=topicSession.createDurableSubscriber(topic, "sub");
 
-            topicConn.start();
 
 
 
@@ -146,7 +149,7 @@ public class StatsProducer extends Thread {
                 String doc = m.getStringProperty("xml");
 
                 System.out.println("Messages received from topic!\n");
-                System.out.println(doc);
+                //System.out.println(doc);
 
 
                 checkFicheiro = validateXML("/Users/jmcalves275/Desktop/Faculdade/Mestrado/IS/Assignment_1/IS2014/Stats Producer/scheme.xsd", doc);
@@ -169,7 +172,8 @@ public class StatsProducer extends Thread {
                 } catch (InterruptedException e1) {
                     e1.printStackTrace();
                 }
-                while (!check && !retryConnection()  ) ;
+                while (!check && !retryConnection()) ;
+                keyboardReader.setTopicConn(topicConn);
 
 
 
@@ -180,6 +184,7 @@ public class StatsProducer extends Thread {
                     e1.printStackTrace();
                 }
                 while (!check && !retryConnection() ) ;
+                keyboardReader.setTopicConn(topicConn);
 
 
             }
@@ -198,7 +203,7 @@ public class StatsProducer extends Thread {
         hashmap.put("Latin America", 0);
         hashmap.put("Middle East", 0);
 
-
+        //filtra mensagens com mais de 12 horas
         for (Iterator<Article> iterator = listaNoticias.getArticle().iterator(); iterator.hasNext();) {
             Article a = iterator.next();
 
@@ -212,7 +217,7 @@ public class StatsProducer extends Thread {
             interval=TimeUnit.MILLISECONDS.toMinutes(interval);
             System.out.println("Titulo: "+a.getTitle()+" section:"+a.getSection()+" data: "+startDate+" intervalo: "+interval);
             if (interval>12*60) {
-                // Remove the current element from the iterator and the list.
+
                 iterator.remove();
             }
         }
@@ -220,8 +225,14 @@ public class StatsProducer extends Thread {
       int numberNews=listaNoticias.getArticle().size();
         System.out.println(numberNews);
         for(Article a:listaNoticias.getArticle()){
+
             if(hashmap.containsKey(a.getSection()))
                 hashmap.put(a.getSection(),hashmap.get(a.getSection())+1);
+            else{
+                if(a.getSection().compareTo("")!=0){
+                    hashmap.put(a.getSection(),1);
+                }
+            }
 
 
         }

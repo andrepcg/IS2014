@@ -7,7 +7,7 @@
     <meta charset="utf-8"/>
     <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
-    <title>Bootstrap 101 Template</title>
+    <title>HTML Summary Creator - CNN</title>
 
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css"/>
     <link rel="stylesheet" href="estilo.css"/>
@@ -27,13 +27,11 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="#">Project name</a>
+          <a class="navbar-brand" href="#">HTML Summary Creator</a>
         </div>
         <div class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
-            <li class="active"><a href="#">Home</a></li>
-            <li><a href="#about">About</a></li>
-            <li><a href="#contact">Contact</a></li>
+            <li class="active"><a href="#">CNN</a></li>
           </ul>
 
         </div><!--/.nav-collapse -->
@@ -46,26 +44,7 @@
     <div class="row">
       <div class="col-sm-12">
 
-      	<div class="btn-group" data-toggle="buttons">
-                  <label class="btn btn-primary">
-                    <input type="checkbox" name="options" id="us" data-section="U.S."/> U.S.
-                  </label>
-                  <label class="btn btn-primary">
-                    <input type="checkbox" name="options" id="africa" data-section="Africa"/> Africa
-                  </label>
-                  <label class="btn btn-primary">
-                    <input type="checkbox" name="options" id="asia" data-section="Asia"/> Asia
-                  </label>
-                  <label class="btn btn-primary">
-                    <input type="checkbox" name="options" id="europe" data-section="Europe"/> Europe
-                  </label>
-                  <label class="btn btn-primary">
-                    <input type="checkbox" name="options" id="latinamerica" data-section="Latin America"/> Latin America
-                  </label>
-                  <label class="btn btn-primary">
-                    <input type="checkbox" name="options" id="middleeast" data-section="Middle East"/> Middle East
-                  </label>
-                </div>
+      	<div class="btn-group" id="menu-sections" data-toggle="buttons" style="margin-bottom: 20px;"></div>
 
         <xsl:for-each select="news_list/article">
         
@@ -91,6 +70,17 @@
                       </span>
                     </li>
                     <li ><span class="glyphicon glyphicon-tag"></span> <span class="categoria"><xsl:attribute name="data-cat"><xsl:value-of select="section"/></xsl:attribute><xsl:value-of select="section"/></span></li>
+
+                    <xsl:choose>
+                       <xsl:when test="video">
+                         <li ><span class="glyphicon glyphicon-facetime-video"></span> <span class="video"><xsl:attribute name="data-cat"><xsl:value-of select="video"/></xsl:attribute><a><xsl:attribute name="href"><xsl:value-of select="video"/></xsl:attribute>Video</a></span></li>
+                       </xsl:when>
+                       <xsl:otherwise>
+                         
+                       </xsl:otherwise>
+                    </xsl:choose>
+                    
+
                     <li ><span class="glyphicon glyphicon-globe"></span> <span class="url"><a><xsl:attribute name="href"><xsl:value-of select="url"/></xsl:attribute>Link</a></span></li>
                   </ul>
                 </div>

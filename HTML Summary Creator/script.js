@@ -1,5 +1,19 @@
   $( document ).ready(function() {
 
+    var sections = [];
+
+    $(".noticia .categoria[data-cat]").each(function() {
+      var sec = $( this ).attr("data-cat");
+      if(sections.indexOf(sec) === -1)
+        sections.push(sec);
+    });
+
+    sections.forEach(function(section){
+      var a = "<label class='btn btn-primary'><input type='checkbox' name='options' data-section='"+section+"'/> "+section+"</label>";
+      $("#menu-sections").append(a);
+
+    });
+
           $("input").change(function(){
             var l = [];
             $("input:checked").each(function(){
@@ -7,7 +21,7 @@
             });
 
             if(l.length === 0){
-              setVisible(["U.S.", "Africa", "Middle East", "Europe", "Asia", "Latin America"], true);
+              setVisible(sections, true);
             }
             else{
 

@@ -22,6 +22,8 @@ import java.sql.Timestamp;
 public class HTMLSummaryCreator implements Runnable{
 
     private final String XSL = "html.xsl";
+    private final String receiveFolder = ".\\received\\";
+
     private JMS jms;
     private boolean on = true;
 
@@ -54,7 +56,7 @@ public class HTMLSummaryCreator implements Runnable{
             BufferedWriter fW;
 
             try {
-                fW = new BufferedWriter(new FileWriter(xmlFile));
+                fW = new BufferedWriter(new FileWriter(receiveFolder + xmlFile));
                 fW.write(XMLmessage, 0, XMLmessage.length());
                 fW.newLine();
                 fW.close();
@@ -65,23 +67,21 @@ public class HTMLSummaryCreator implements Runnable{
 
             }
 
-            System.out.println(success);
-
-            /*
-            if ( success && this.generateHTML(timestamp, xmlFile)) {
-
+            String html;
+            if ( success && (html = this.generateHTML(timestamp, xmlFile)) != null) {
+                System.out.println("HTML generated " + html);
 
             } else {
 
 
             }
-            */
+
         }
 
         return false;
     }
 
-    private boolean generateHTML(String timestamp, String xmlFile) {
+    private String generateHTML(String timestamp, String xmlFile) {
 
         String html = "HTML_" + timestamp + ".html";
 
@@ -91,17 +91,17 @@ public class HTMLSummaryCreator implements Runnable{
         try {
 
             Transformer transformer = factory.newTransformer(xslt);
-            StreamSource text = new StreamSource(xmlFile);
+            StreamSource text = new StreamSource(receiveFolder + xmlFile);
             transformer.transform(text, new StreamResult(html));
 
         } catch (TransformerConfigurationException e) {
             e.printStackTrace();
-            return false;
+            return null;
         } catch (TransformerException e) {
             e.printStackTrace();
-            return false;
+            return null;
         }
-        return true;
+        return html;
     }
 
     private boolean validateXML(String xml) {

@@ -8,15 +8,18 @@ import java.util.Scanner;
 /**
  * Created by jmcalves275 on 10/10/14.
  */
-public class Reader extends  Thread {
-    private TopicConnection connection;
+public class Reader extends Thread {
+    private TopicConnection topicConn;
     boolean check;
-    TopicSession topicSession;
+    private TopicSession topicSession;
     public Reader(TopicConnection topicConn,TopicSession topicSession,boolean check){
 
-        this.connection=topicConn;
+        this.topicConn=topicConn;
         this.topicSession=topicSession;
         this.check=check;
+    }
+    public void setTopicConn(TopicConnection topicConn){
+        this.topicConn=topicConn;
     }
 
     public void run(){
@@ -25,7 +28,8 @@ public class Reader extends  Thread {
             if (sc.nextLine().compareTo("exit") == 0) {
                 check = true;
                 try {
-                    connection.close();
+                    topicConn.close();
+
 
 
                     System.exit(0);
@@ -38,4 +42,6 @@ public class Reader extends  Thread {
             }
         }
     }
+
+
 }
